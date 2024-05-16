@@ -1,6 +1,7 @@
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 import pandas as pd
 from all_match import all_match
-from pymongo import MongoClient
 
 def union(items, jobs):
     matched_result = all_match(items, jobs)
@@ -41,15 +42,29 @@ def union(items, jobs):
 
     print("Combined DataFrame:")
     print(combined_df)
-    
+
+    # Connect to MongoDB
     client = MongoClient("mongodb+srv://ayush:user@cluster0.f2dpvrq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
     db = client['test']  # Change 'your_database' to your actual database name
     collection = db['results']  # Change 'your_collection' to your actual collection name
 
-    # Convert DataFrame to dictionary and insert into MongoDB
+    # Convert DataFrame to dictionary and update MongoDB
     records = combined_df.to_dict(orient='records')
     for record in records:
-        record['jobIds'] = list(record['jobIds'])  # Convert jobIds from set to list
-    collection.insert_many(records)
+        user_id = record['userId']
+        existing_doc = collection.find_one({"userId": user_id})
+
+        # If user document already exists, update it
+        if existing_doc:
+            new_job_ids = list(record['jobIds'])  # Convert jobIds from set to list
+            collection.update_one(
+                
+                {"_id": existing_doc["_id"]},
+                {"$addToSet": {"jobIds": {"$each": new_job_ids}}}
+            )
+        else:
+            # Otherwise, insert a new document
+            record['jobIds'] = list(record['jobIds'])  # Convert jobIds from set to list
+            collection.insert_one(record)
 
     print("Combined DataFrame stored in MongoDB.")
