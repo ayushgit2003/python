@@ -40,8 +40,8 @@ def union(items, jobs):
     # Create a new DataFrame with the combined results
     combined_df = pd.DataFrame(combined_result)
 
-    print("Combined DataFrame:")
-    print(combined_df)
+    # print("Combined DataFrame:")
+    # print(combined_df)
 
     # Connect to MongoDB
     client = MongoClient("mongodb+srv://ayush:user@cluster0.f2dpvrq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
