@@ -89,7 +89,7 @@ async def fetch_data():
 async def call_api_every_two_minutes():
     while True:
         await fetch_data()
-        await asyncio.sleep(120)  # Sleep for 120 seconds (2 minutes)
+        await asyncio.sleep(30)  # Sleep for 120 seconds (2 minutes)
 
 @app.get("/items/", response_model=List[Item])
 async def get_items():
